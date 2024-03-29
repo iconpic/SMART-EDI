@@ -1,23 +1,26 @@
 import http.client
 import json
 import http.client
+from decouple import config
 import mimetypes
 from codecs import encode
 
-# test_list = ['7705739450', '7727089950', '3721007671', '2222810899', '7215003597', '7842448766']
-test_list = ['7701617450', '7814010561', '7730570800', '7722761751', '2222810899']
 
+ddauth_api_client_id = config('ddauth_api_client_id', default='')
+Gravitee_Api_Key = config('X-Gravitee-Api-Key', default='')
+login = config('login', default='')
+password = config('password', default='')
 
 def authorization():
   conn = http.client.HTTPSConnection("api-ext.ru.auchan.com")
   payload = json.dumps({
-    "Login": "edowg@auchan.ru",
-    "Password": "12345678"
+    "Login": login,
+    "Password": password
   })
   headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'DiadocAuth ddauth_api_client_id=auchan-6d093803-34f7-4a3d-81b1-bd268e0494af',
-    'X-Gravitee-Api-Key': '7d3ca061-edae-437b-9a72-2f6d79cc32e3'
+    'Authorization': f'DiadocAuth ddauth_api_client_id={ddauth_api_client_id}',
+    'X-Gravitee-Api-Key': Gravitee_Api_Key
   }
   conn.request("POST", "/edi/diadoc-out/v1/V3/Authenticate?type=password", payload, headers)
   res = conn.getresponse()
@@ -27,7 +30,7 @@ def authorization():
 
 # x = authorization()
 # print(x)
-token = 'iHZBnwzPu0QISn4wXwxKaKKb2A9MVY2tqpOxMbwBR22QoFM5QJm78XGtHRtyOWEiKTFySb3jGkh6iaeLamlwmmE83Chs5aeJLsVu7U96h0tUvitNzPNkrR37Chj3acBszeDRtGKjuU1sxT8nu8c2SzA2RRopxWHb3n/rSOliVoY='
+token = ''
 
 
 def get_to_counteragents(token, afterIndexKey = ''):
@@ -35,10 +38,10 @@ def get_to_counteragents(token, afterIndexKey = ''):
   boundary = ''
   payload = ''
   headers = {
-    'Authorization': f'DiadocAuth ddauth_api_client_id=auchan-6d093803-34f7-4a3d-81b1-bd268e0494af, ddauth_token={token}',
+    'Authorization': f'DiadocAuth ddauth_api_client_id={ddauth_api_client_id}, ddauth_token={token}',
     'Accept': 'application/json',
     'Content-Type': 'application/json; charset=utf-8',
-    'X-Gravitee-Api-Key': '7d3ca061-edae-437b-9a72-2f6d79cc32e3',
+    'X-Gravitee-Api-Key': Gravitee_Api_Key,
     'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
   }
   conn.request("GET", f"/edi/diadoc-out/v1/V2/GetCounteragents?myOrgId=13f51fdb-ee1e-43a8-bfd7-667f34b23246&counteragentStatus=IsMyCounteragent&afterIndexKey={afterIndexKey}", payload, headers)
@@ -78,10 +81,10 @@ def get_organization(token, inn, kpp=''):
     boundary = ''
     payload = ''
     headers = {
-      'Authorization': f'DiadocAuth ddauth_api_client_id=auchan-6d093803-34f7-4a3d-81b1-bd268e0494af, ddauth_token={token}',
+      'Authorization': f'DiadocAuth ddauth_api_client_id={ddauth_api_client_id}, ddauth_token={token}',
       'Accept': 'application/json',
       'Content-Type': 'application/json; charset=utf-8',
-      'X-Gravitee-Api-Key': '7d3ca061-edae-437b-9a72-2f6d79cc32e3',
+      'X-Gravitee-Api-Key': Gravitee_Api_Key,
       'Content-type': 'multipart/form-data; boundary={}'.format(boundary)
     }
     conn.request("GET",
